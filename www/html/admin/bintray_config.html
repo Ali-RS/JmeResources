@@ -1,0 +1,99 @@
+{guest}
+    please <a href="/login/">log in</a> to view this page.
+{/guest}
+
+
+{admin}
+
+<script type="text/javascript">
+
+    angular.module("bintray", [])
+            .controller("BintrayController", [ "$scope", "$http", function($scope, $http) {
+
+                $scope.bintrayConfig = {};
+
+                $scope.getBintrayConfig = function() {
+
+                    $http({
+                        method: "GET",
+                        url: "/api/configuration/bintray/"
+                    }).then(function successCallback(response) {
+                        $scope.bintrayConfig = response.data;
+                    }, function errorCallback(response) {
+                        alert("unable to retrieve bintray data.");
+                    });
+
+                };
+
+                $scope.saveBintrayConfig = function() {
+
+                    $http({
+                        method: "POST",
+                        url: "/admin/bintray/",
+                        data: $scope.bintrayConfig
+                    }).then(function successCallback(response) {
+                        bootbox.alert("Changes saved successfully.")
+                    }, function errorCallback(response) {
+                        alert("unable to save bintray data.");
+                    });
+
+                };
+
+            }]);
+
+</script>
+
+<div ng-app="bintray" ng-controller="BintrayController" data-ng-init="getBintrayConfig()">
+
+    <div class="row">
+
+        <h3>Bintray Settings</h3>
+        <hr>
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <label for="bintray-user" class="col-sm-2 control-label">User</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bintray-user" ng-model="bintrayConfig.user">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bintray-api-key" class="col-sm-2 control-label">Api Key</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bintray-api-key" ng-model="bintrayConfig.apiKey">
+                </div>
+                </div>
+
+            <div class="form-group">
+                <label for="bintray-subject" class="col-sm-2 control-label">Subject</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bintray-subject" ng-model="bintrayConfig.subject">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bintray-repo" class="col-sm-2 control-label">Repository</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="bintray-repo" ng-model="bintrayConfig.repo">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-success" style="margin-left: 10px;" ng-click="saveBintrayConfig()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{/admin}

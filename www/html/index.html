@@ -1,0 +1,93 @@
+<script type="text/javascript">
+
+    angular.module("search", [])
+            .controller("SearchController", ["$scope", "$http", function ($scope, $http) {
+
+                $scope.results = [];
+
+                $scope.search = function (searchterm) {
+
+                    $("#ajax-loader").css("display", "initial");
+
+                    $http({
+                        method: "GET",
+                        url: "/search/" + searchterm
+                    }).then(function successCallback(response) {
+
+                        $("#ajax-loader").css("display", "none");
+                        $scope.results = response.data;
+
+                    }, function errorCallback(response) {
+
+                        $("#ajax-loader").css("display", "none");
+                        alert("lost " + searchterm);
+
+                    });
+                };
+
+                $http({
+                    method: "GET",
+                    url: "/api/asset/random/"
+                }).then(function successCallback(response) {
+
+                    $("#ajax-loader").css("display", "none");
+                    $scope.results = response.data;
+
+                }, function errorCallback(response) {
+
+                    $("#ajax-loader").css("display", "none");
+
+                });
+
+            }]);
+
+</script>
+
+<div ng-app="search" ng-controller="SearchController">
+
+    <div class="row">
+        <div class="col-xs-12" style="font-size: 24px; text-shadow: 0px 2px 3px #555; color: #222;">
+            Resource Search: {{searchterm}}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <form novalidate class="simple-form" name="searchform" ng-submit="search(searchterm)">
+                <input autocomplete="off" id="search-bar" type="text" ng-model="searchterm">
+            </form>
+        </div>
+    </div>
+
+    <div id="ajax-loader" style="display: none;">
+        <br>
+        <img src="/theme/images/ajax.gif" alt="loading">
+    </div>
+
+    <br>
+
+    <div class="row" ng-repeat="assetInfo in results track by $index" ng-if="$index % 2 == 0">
+
+        <div class="col-sm-6" ng-repeat="i in [$index, $index + 1]" ng-if="results[i] != null">
+
+            <div class="panel" style="padding: 10px;">
+
+                <h3><a ng-href="/asset/{{results[i].user.username}}/{{results[i].asset.packageName}}/">{{results[i].asset.packageName}}</a>
+                    <span class="badge" style="background-color: green;">{{results[i].versions[results[i].versions.length -1].version}}</span>
+                </h3>
+
+                <span>{{results[i].versions[results[i].versions.length -1].description}}</span>
+                <br><br>
+                <img ng-src="{{results[i].versions[results[i].versions.length -1].showcaseImage}}" style="max-width: 100%; max-height: 100%; border-radius: 4px;" />
+
+                <br>
+                <div style="margin-top: 10px; padding: 10px 15px; background-color: #383838; border-radius: 4px;" class="">Uploaded by <em>{{results[i].user.username}} on {{results[i].versions[results[i].versions.length -1].timeUploaded | date : 'medium'}}</em></div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>

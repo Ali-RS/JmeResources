@@ -1,0 +1,149 @@
+<script type="text/javascript">
+    
+    angular.module("displayresource", [])
+        .controller("DisplayResourceController", [ "$scope", "$http", function($scope, $http) {
+               
+            $scope.resource = {};
+            $scope.readme = "";
+                    
+            $scope.getResource = function() {
+                
+                var rName = window.location.href.match(/\/([^/]*)$/)[1];
+                
+                $http({
+                    method: "GET",
+                    url: "/get/" + rName
+                }).then(function successCallback(response) {
+                    
+                    $scope.resource = response.data;
+                    
+                    $("#ajax-loader").css("display", "none");
+                    $("#resourceDiv").css("display", "initial");
+                    
+                    $scope.getReadme();
+                    
+                }, function errorCallback(response) {
+                    
+                    $("#ajax-loader").css("display", "none");
+                    alert("An error occured retrieving that resource.");
+                    
+                });
+                
+                $scope.getReadme = function() {
+                    
+                    $http({
+                        method: "GET",
+                        url: "/readme/" + rName
+                    }).then(function successCallback(response) {
+                        
+                        $scope.readme = response.data;
+                        
+                    }, function errorCallback(response) {
+                        
+                        $scope.readme = "an error occured retrieving the readme.";
+                        
+                    });
+                    
+                };
+            };
+    }]);
+    
+</script>
+
+<div id="ajax-loader" style="width: 64px; margin-left: auto; margin-right: auto;">
+    <br>
+    <img src="/theme/images/ajax.gif" alt="loading">
+</div>
+
+<div ng-app="displayresource" ng-controller="DisplayResourceController" ng-init="getResource()" id="resourceDiv" style="display: none;">
+    
+    <div class="row">
+        
+        <div class="col-xs-12">
+            <h2>{{resource.name}}</h2>
+
+            <strong>Latest Version: </strong>{{resource.latest_version}}</span><br>
+            <strong>Last Updated: </strong>{{resource.updated | date:"EEEE dd MMMM @ HH:mm"}}<br>
+            <br>
+            <span>{{resource.desc}}</span>
+        </div>
+    
+        <div class="col-xs-12">
+            <br>
+            {{readme}}
+        </div>
+        
+        <div class="col-xs-12">
+            
+            <br>
+            
+            
+            
+            <div class="panel panel-jmonkey">
+                <div class="panel-body">
+                    Download
+                </div>
+                <div class="panel-footer panel-footer-jmonkey">
+                    <a class="btn btn-sm btn-success" href="https://bintray.com/artifact/download/jmonkeyengine/org.jmonkeyengine/org/jmonkeyengine/{{resource.name}}/{{resource.latest_version}}/{{resource.name}}-{{resource.latest_version}}.jar">JAR</a>
+                    <a class="btn btn-sm btn-info" href="https://bintray.com/artifact/download/jmonkeyengine/org.jmonkeyengine/org/jmonkeyengine/{{resource.name}}/{{resource.latest_version}}/{{resource.name}}-{{resource.latest_version}}-javadoc.jar">JAVADOC</a>
+                    <a class="btn btn-sm btn-info" href="https://bintray.com/artifact/download/jmonkeyengine/org.jmonkeyengine/org/jmonkeyengine/{{resource.name}}/{{resource.latest_version}}/{{resource.name}}-{{resource.latest_version}}-sources.jar">SOURCE</a>
+                </div>
+            </div>
+            
+            
+            
+        </div>
+        
+        
+        
+    </div>
+    
+    <div class="row">
+        
+        <div class="col-xs-4">
+            <div class="panel panel-jmonkey">
+                <div class="panel-body">
+                    Maven
+                </div>
+                <div class="panel-footer panel-footer-jmonkey codefont">
+                    &lt;dependency&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;{{resource.repo}}&lt;/groupId&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;{{resource.name}}&lt;/artifactId&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;{{resource.latest_version}}&lt;/version&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;type&gt;pom&lt;/type&gt;<br>
+                    &lt;/dependency&gt;
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xs-4">
+            <div class="panel panel-jmonkey">
+                <div class="panel-body">
+                    Gradle
+                </div>
+                <div class="panel-footer panel-footer-jmonkey">
+                    
+                    compile '{{resource.repo}}:{{resource.name}}:{{resource.latest_version}}'
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xs-4">
+            <div class="panel panel-jmonkey">
+                <div class="panel-body">
+                    Ivy
+                </div>
+                <div class="panel-footer panel-footer-jmonkey">
+                    
+                    &lt;dependency org='{{resource.repo}}' name='{{resource.name}}' rev='{{resource.latest_version}}'&gt;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifact name='$AID' ext='pom'&gt;&lt;/artifact&gt;<br>
+                    &lt;/dependency&gt;
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>

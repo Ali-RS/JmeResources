@@ -1,0 +1,231 @@
+{guest}
+    please <a href="/login/">log in</a> to view this page.
+{/guest}
+
+{admin}
+
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-abbr.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-container.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-deflist.min.js"></script>
+<!--<script src="/theme/lib/markdown-it-6.0.0/markdown-it-emoji.min.js"></script>-->
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-footnote.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-ins.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-mark.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-sub.min.js"></script>
+<script src="/theme/lib/markdown-it-6.0.0/markdown-it-sup.min.js"></script>
+
+<script src="https://twemoji.maxcdn.com/twemoji.min.js"></script>
+<script src="https://cdn.jsdelivr.net/highlight.js/8.4.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/8.4.0/styles/hybrid.min.css">
+
+<script type="text/javascript">
+
+
+
+</script>
+
+<script type="text/javascript">
+
+    angular.module("potentialAssets", [])
+            .controller("PotentialAssetsController", [ "$scope", "$http", function($scope, $http) {
+
+                var markdownConfig = {
+
+                    html: false,                    // Enable HTML tags in source
+                    xhtmlOut: false,                // Use '/' to close single tags (<br />)
+                    breaks: true,                   // Convert '\n' in paragraphs into <br>
+                    langPrefix: 'hljs language-',   // CSS language prefix for fenced blocks
+                    linkify: true,                  // autoconvert URL-like texts to links
+                    typographer: true,              // Enable smartypants and other sweet transforms
+
+                    highlight: function (str, lang) {
+
+                        if (lang && hljs.getLanguage(lang)) {
+                            try {
+                                return hljs.highlight(lang, str).value;
+                            } catch (__) {
+                            }
+                        }
+
+                        try {
+                            return hljs.highlightAuto(str).value;
+                        } catch (__) {
+                        }
+
+                        return ''; // use external default escaping
+                    }
+                };
+
+                var markdown = window.markdownit(markdownConfig)
+                        .use(window.markdownitAbbr)
+                        .use(window.markdownitDeflist)
+                        // .use(window.markdownitEmoji)
+                        .use(window.markdownitFootnote)
+                        .use(window.markdownitIns)
+                        .use(window.markdownitMark)
+                        .use(window.markdownitSub)
+                        .use(window.markdownitSup);
+
+                // Beautify output of parser for html content
+                markdown.renderer.rules.table_open = function ()
+                {
+                    return '<table class="table table-striped">\n';
+                };
+
+                // Replace emoji codes with images
+                markdown.renderer.rules.emoji = function(token, idx)
+                {
+                    return window.twemoji.parse(token[idx].to);
+                };
+
+
+
+
+
+                $scope.potentialAssets = {};
+
+                $scope.getPotentialAssets = function() {
+
+                    $http({
+                        method: "GET",
+                        url: "/api/asset/potentials/"
+                    }).then(function successCallback(response) {
+
+                        $scope.potentialAssets = response.data;
+
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
+
+                };
+
+                $scope.getPotentialAssets();
+
+                $scope.viewShowcaseImage = function(image) {
+
+                    var data = "<img src='" + image + "' alt='showcase image' style='max-height: 100%; max-width: 100%;' />";
+                    bootbox.alert({
+                        title: "Showcase Image",
+                        message: data,
+                    });
+
+                };
+
+                $scope.viewReadme = function(readme) {
+
+                    var resultInline = markdown.render(readme);
+                    // data.longDescription = $sce.trustAsHtml(resultInline);
+
+                    bootbox.alert({
+                        size: "large",
+                        title: "Asset Readme",
+                        message: resultInline
+                    })
+
+                };
+
+                $scope.viewStructure = function(structure) {
+
+                    var data = "<div style='margin: auto;'>" + structure
+
+                };
+
+                $scope.approvePotentialAsset = function(potentialAssetId) {
+
+                    $http({
+                        method: "POST",
+                        url: "/api/asset/",
+                        data: JSON.stringify(potentialAssetId)
+                    }).then(function successCallback(response) {
+
+                        bootbox.alert("Approved!");
+
+                        $scope.potentialAssets.forEach(function(result, index) {
+
+                            if (result["potentialAsset"].id == potentialAssetId) {
+                                $scope.potentialAssets.splice(index, 1);
+                            }
+                        });
+
+
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
+                };
+
+            }]);
+
+</script>
+
+<div ng-app="potentialAssets" ng-controller="PotentialAssetsController">
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>Potential Assets</h2>
+            These assets are awaiting approval. They are not available or visible to the public until they
+            are approved by a member of staff.
+
+            <hr>
+
+        </div>
+    </div>
+
+
+    <div class="row search-result" ng-repeat="pa in potentialAssets">
+
+        <div class="col-sm-8" >
+
+            <h3>{{pa.potentialAsset.packageName}}</h3>
+            <span>Uploaded by <em>{{pa.user.username}}</em> on <em>{{pa.potentialAsset.dateUploaded | date: 'medium' }}</em></span>
+            <br><br>
+
+            <button class="btn btn-primary" data-toggle="modal" data-target="#structureModal{{pa.potentialAsset.id}}"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;&nbsp;Structure</button>
+            <button class="btn btn-primary" ng-click="viewShowcaseImage(pa.potentialAsset.showcaseImage)"><span class="glyphicon glyphicon-picture" aria-hidden="true"></span>&nbsp;Showcase Image</button>
+            <button class="btn btn-primary"  ng-click="viewReadme(pa.potentialAsset.packageDescription)"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;Readme</button>
+
+            <br><br>
+
+            <div id="structureModal{{pa.potentialAsset.id}}" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Asset Structure</h4>
+                        </div>
+                        <div class="modal-body codefont">
+
+                            <div ng-repeat="dir in pa.structure">
+                                {{ dir }}<br>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-4">
+            <br>
+            <button class="btn btn-success" ng-click="approvePotentialAsset(pa.potentialAsset.id)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Approve</button>
+            <button class="btn btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject</button>
+            <br><br>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-12" ng-show="potentialAssets.length == 0">
+            There are no assets awaiting approval at this time.
+        </div>
+
+    </div>
+
+</div>
+
+{/admin}

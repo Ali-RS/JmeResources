@@ -1,0 +1,39 @@
+{
+  "general": {
+    "user-agent": "JmonkeyEngine Resource Website"
+  },
+    
+  "server": {
+    "bind-path": "",
+    "bind-port": "5050"
+  },
+    
+  "website": {
+    "html-path": "./www/html/",
+    "themes-path": "./www/themes/",
+    "active-theme-path": "./www/themes/default/",
+    "permissions-path": "./permissions/",
+    "uploads-path": "./uploads/"
+  },
+    
+  "bintray": {
+    "user": "user",
+    "api-key": "your-api-key",
+    "owner": "jmonkeyengine",
+    "repo": "org.jmonkeyengine"
+    },
+
+  "discourse": {
+    "base-url": "http://hub.jmonkeyengine.org/"
+  },
+
+  "database": {
+    "name": "databasename",
+    "user": "user",
+    "password": "password",
+    "host": "",
+    "port": "3306",
+    "type": "MYSQL"
+  }
+
+}

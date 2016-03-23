@@ -1,0 +1,27 @@
+{guest}
+<div>
+    Please <a href="/login/">log in</a> to view this web page.
+</div>
+{/guest}
+
+{logged_in}
+
+<div>
+
+    <div class="row">
+
+        <form method="POST" action="/install/">
+            <div class="form-group">
+                <label for="secret">Please enter the case-sensitive secret passphrase.</label>
+                <input name="secret" type="text" class="form-control" id="secret">
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{/logged_in}

@@ -1,0 +1,126 @@
+<script type="text/javascript">
+
+    angular.module("userAsset", [])
+            .controller("UserAssetController", [ "$scope", "$http", function($scope, $http) {
+
+                $scope.assetInfo = [];
+                $scope.selectedVersion = "";
+
+                $scope.versionViewer = function(version) {
+                    return (version == $scope.selectedVersion);
+                };
+
+                $scope.changedVersion = function(version) {
+                    $scope.selectedVersion = version;
+                };
+
+                $scope.getAssetInfo = function(user, packageName) {
+
+                    $http({
+                        method: "GET",
+                        url: "/api/asset/" + user + "/" + packageName + "/"
+                    }).then(function successCallback(response) {
+
+                        $scope.assetInfo = response.data;
+                        $scope.selectedVersion = $scope.assetInfo.versions[$scope.assetInfo.versions.length - 1].version;
+
+                    }, function errorCallback(response) {
+
+                        bootbox.alert(response.data);
+                    });
+                };
+
+                var metaElement = $("meta[name=asset-data]");
+                var user = $(metaElement).attr("data-user");
+                var packageName = $(metaElement).attr("data-package");
+
+                $scope.getAssetInfo(user, packageName);
+
+            }]);
+
+</script>
+
+<div ng-app="userAsset" ng-controller="UserAssetController">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>{{assetInfo.asset.packageName}} <small></small></h2>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-8">
+            <div ng-repeat="version in assetInfo.versions" ng-show="versionViewer(version.version)">
+                <div style="background-color: #000;">
+                <img class="center-block" ng-src="{{version.showcaseImage}}" style="max-width: 100%; max-height: 353px;" />
+                </div>
+
+                <br><br>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {{version.description}}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success">Download</button>
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{selectedVersion}}&nbsp;&nbsp;<span class="glyphicon glyphicon-menu-down"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li ng-repeat="version in assetInfo.versions"><a href="#" ng-click="changedVersion(version.version)">{{version.version}}</a></li>
+                        </ul>
+                    </div>
+
+                    <hr>
+
+                    <div ng-repeat="version in assetInfo.versions" ng-show="versionViewer(version.version)">
+
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                            Published by {{assetInfo.user.username}} on {{version.timeUploaded | date: 'medium'}}
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <div class="row">
+        <br>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-8">
+            <div>
+                {{assetInfo.asset.readme}}
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+
+
+
+        </div>
+
+    </div>
+
+</div>

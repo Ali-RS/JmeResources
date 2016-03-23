@@ -1,0 +1,197 @@
+{guest}
+please <a href="/login/">log in</a> to view this page.
+{/guest}
+
+{logged_in}
+
+{/logged_in}
+
+{admin}
+
+<script type="text/javascript">
+    angular.module("admin", [])
+            .controller("AdminController", [ "$scope", "$http", function($scope, $http) {
+
+                $scope.configData = {};
+                $scope.adminName = "";
+
+                $scope.getGeneralConfiguration = function() {
+                    $http({
+                        method: "GET",
+                        url: "/api/configuration/general/"
+                    }).then(function successCallback(response) {
+                        $scope.configData = response.data;
+                    }, function errorCallback(response) {
+                        alert("unable to retrieve general configuration data.");
+                    });
+                };
+
+                $scope.getAdmins = function() {
+
+                    $http({
+                        method: "GET",
+                        url: "/api/user/permission/admin/"
+                    }).then(function successCallback(response) {
+                        $scope.admins = response.data;
+                    }, function errorCallback(response) {
+                        alert("unable to retrieve admin list.");
+                    });
+
+                }
+
+                $scope.usernameSuggestions = {};
+
+                $scope.findUsers = function(partialName) {
+
+                    $http({
+                        method: "POST",
+                        url: "/api/user/search/",
+                        data: JSON.stringify(partialName)
+                    }).then(function successCallback(response) {
+                        $scope.usernameSuggestions = response.data;
+                    }, function errorCallback(response) {
+
+                    });
+
+                }
+
+                $scope.addAdmin = function(username) {
+
+                    $http({
+                        method: "POST",
+                        url: "/admin/admins/add/",
+                        data: username
+                    }).then(function successCallback(response) {
+
+                        $scope.getGeneralConfiguration();
+
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
+
+                };
+
+                $scope.removeAdmin = function(username) {
+
+                    $http({
+                        method: "POST",
+                        url: "/admin/admins/remove/",
+                        data: JSON.stringify(username)
+                    }).then(function successCallback(response) {
+
+                        $scope.getGeneralConfiguration();
+
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
+
+                }
+
+                $(document).ready(function() {
+
+                    $("#usersearch").on("input", function(e) {
+
+                        if (this.value.length >= 3) {
+                            $scope.findUsers(this.value);
+                        }
+
+                    });
+
+                });
+
+                $scope.saveGeneralConfig = function() {
+
+                    $http({
+                        method: "POST",
+                        url: "/admin/",
+                        data: $scope.configData.general
+                    }).then(function successCallback(response) {
+                        bootbox.alert("Changes saved successfully.")
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
+
+                };
+
+            }]);
+
+</script>
+
+<div ng-app="admin" ng-controller="AdminController" data-ng-init="getGeneralConfiguration()">
+
+    <div class="row">
+
+        <div class="col-sm-12">
+
+            <h4>JmeResource Website Administrators</h4>
+            <p>
+                A list of administrators for this website. This list does not affect any other sub-domain and is not directly
+                associated with any sub-domain. <strong>Adding or removing administrators affects this website only</strong>.
+            </p>
+
+            <div class="well">
+                <ul>
+                    <li ng-repeat="user in configData.admins">{{user.username}}</li>
+                </ul>
+            </div>
+
+            <div class="input-group">
+
+                <input type="text" class="form-control" list="suggestions" id="usersearch" ng-model="adminName">
+                <datalist id="suggestions">
+                    <option ng-repeat="suggestion in usernameSuggestions" value="{{suggestion.username}}">
+                </datalist>
+
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-success" ng-disabled="adminName.length <= 2" ng-click="addAdmin(adminName)">Add</button>
+                    <button type="button" class="btn btn-danger" ng-disabled="adminName.length <= 2" ng-click="removeAdmin(adminName)">Remove</button>
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+    <div class="row">
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <label for="user-agent" class="col-sm-2 control-label">User Agent</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="user-agent" ng-model="configData.general.userAgent">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="title-prepend" class="col-sm-2 control-label">Page Title Prepend</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="title-prepend" ng-model="configData.general.pageTitlePrepend">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="title-append" class="col-sm-2 control-label">Page Title Append</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="title-append" ng-model="configData.general.pageTitleAppend">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-success" style="margin-left: 10px;" ng-click="saveGeneralConfig()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{/admin}

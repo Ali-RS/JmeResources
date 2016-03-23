@@ -1,0 +1,161 @@
+
+{guest}
+
+<div>
+    You must <a href="/login/">log in</a> before you can upload any assets.
+</div>
+
+{/guest}
+
+{logged_in}
+
+<script src="/theme/lib/bootbox-4.4.0/bootbox.min.js"></script>
+<script src="/theme/lib/filestyle-1.2.1/bootstrap-filestyle.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip({ placement: "auto left" });
+
+        $("#uploadFile").change(function() {
+            var ext = this.value.match(/\.([^\.]+)$/)[1];
+            switch(ext)
+            {
+                case 'jar':
+                    break;
+                default:
+                    $(":file").filestyle('clear');
+                    bootbox.alert('Only jar files (.jar) are allowed to be uploaded.');
+                    $(this).trigger("change");
+            }
+        });
+    });
+
+    angular.module("uploadAsset", [])
+            .controller("UploadAssetController", [ "$scope", "$http", function($scope, $http) {
+
+                function checkFileSize(maxSize) {
+
+                    var uploadObj =  document.getElementById("assetFile"); // $("#uploadFile");
+
+                    var fileSize = uploadObj.files[0].size; // in bytes
+
+                    if(fileSize > maxSize) {
+                        bootbox.alert('file size is more than ' + maxSize + ' bytes');
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                $scope.asset = [];
+
+                $scope.uploadAssetData = function(uploadForm) {
+
+                    // this is checked server-side too, but saves the user the hassle to check beforehand
+                    var maxSize = 52428800 // 50mb
+
+                    if (!checkFileSize()) {
+                        return false;
+                    }
+
+                    $http({
+                        method: "POST",
+                        url: "/asset/upload/",
+                        headers: { 'Content-Type': undefined },
+                        transformRequest: function(data) {
+
+                            var formData = new FormData();
+
+                            for (var key in data.model) {
+                               formData.append(key, data.model[key]);
+                            }
+
+                            formData.append("assetFile", data.file);
+
+                            return formData;
+                        },
+                        data: { model: $scope.asset, file: document.getElementById("assetFile").files[0] }
+                    }).then(function successCallback(response) {
+
+                        bootbox.alert("done");
+
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
+
+                }
+
+
+            }])
+            .directive("validFile", function() {
+                return {
+                    require: "ngModel",
+                    link: function(scope, el, attrs, ngModel) {
+                        el.bind("change", function() {
+                            scope.$apply(function() {
+                                ngModel.$setViewValue(el.val());
+                                ngModel.$render();
+                            })
+                        })
+                    }
+                }
+            });
+</script>
+
+<div ng-app="uploadAsset" ng-controller="UploadAssetController">
+
+    <form name="uploadForm" novalidate ng-submit="uploadAssetData(uploadForm)" enctype="multipart/form-data">
+
+        <div class="form-group">
+            <label for="packageName" data-toggle="tooltip" title="Package name may contain numbers, letter and the following characters: .-_:">Package Name</label>
+            <input class="form-control" id="packageName" type="text" ng-model="asset.packageName" ng-minlength="3" required>
+        </div>
+
+        <div class="form-group">
+            <label for="licenseType">License</label>
+            <select class="form-control" id="licenseType" ng-model="asset.licenseType" required>
+                <option>CC0-1.0</option>
+                <option>Another License</option>
+                <option>Some other license</option>
+                <option>GPL</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="showcaseImage" data-toggle="tooltip" title="Please use an image that is at least 720p (1280x720) or higher.">Showcase Image</label>
+            <input type="text" class="form-control" id="showcaseImage" ng-model="asset.showcaseImage" required>
+        </div>
+
+        <div class="form-group">
+            <label for="versionDescription" data-toggle="tooltip" title="A short description of your asset.">Short Description</label>
+            <input type="text" id="versionDescription" ng-model="asset.versionDescription" class="form-control" ng-minlength="3" required>
+        </div>
+
+        <div class="form-group">
+            <label for="packageReadme" data-toggle="tooltip" title="Markdown support only!">Readme</label>
+            <textarea class="form-control" id="packageReadme" style="height: 300px;" ng-model="asset.packageReadme" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="assetFile">Select Your Asset - Maximum Size: 50mb</label>
+            <input type="file" id="assetFile" class="filestyle" data-icon="false" data-buttonBefore="true" valid-file data-buttonName="btn-primary" ng-model="asset.assetFile" accept=".jar" required>
+        </div>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="asset.termsAccepted" required>
+                I have read and understood that I am only allowed to upload a set of specific files according to <a href="#">this article</a>.
+                I have provided as much information about the asset to the best of my knowledge, and are satisfied that my work is
+                of a standard that jMonkey will deem appropriate.
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" ng-disabled="uploadForm.$invalid">Upload My Asset</button>
+
+    </form>
+</div>
+
+{/logged_in}

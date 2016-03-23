@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:annotation-config/>
+    <mvc:annotation-driven />
+
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="mediaTypes">
+            <map>
+                <entry key="eot" value="application/vnd.ms-fontobject" />
+                <entry key="ttf" value="application/font-sfnt" />
+                <entry key="svg" value="image/svg+xml" />
+                <entry key="woff" value="application/font-woff" />
+                <entry key="woff2" value="application/font-woff2" />
+            </map>
+        </property>
+    </bean>
+
+    <bean name="resourceHandler" class="org.jmonkey.server.CustomResourceHandler">
+    </bean>
+
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="urlMap">
+            <map>
+                <entry key="/theme/**" value-ref="resourceHandler"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="50000000" />
+    </bean>
+
+    <mvc:resources mapping="/favicon.ico" location="./www/html/favicon.ico" />
+
+    <context:component-scan base-package="org.jmonkey.server.controller.html"/>
+
+</beans>
+

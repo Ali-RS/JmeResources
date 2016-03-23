@@ -1,0 +1,76 @@
+<script type="text/javascript">
+
+    angular.module("login", [])
+            .controller("LoginController", ["$scope", "$http", function ($scope, $http) {
+
+                $scope.logindata = {};
+
+
+                $scope.login = function () {
+
+                    // disable the form...
+
+                    $("#login-form :input").prop("disabled", true);
+
+                    $http({
+                        method: "POST",
+                        url: "/login/",
+                        data: $scope.logindata
+                    }).then(function successCallback(response) {
+
+                        window.location.href = "/";
+
+                    }, function errorCallback(response) {
+
+                        $("#login-form :input").prop("disabled", false);
+
+                    });
+
+                }
+
+
+            }]);
+
+
+</script>
+
+<div ng-app="login" ng-controller="LoginController">
+
+    <div class="row">
+        <div class="col-sm-offset-2 col-sm-5">
+            Please log in using your credentials from <a href="http://hub.jmonkeyengine.org">hub.jmonkeyengine.org</a>.
+            <br><br>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <form class="form-horizontal" id="login-form" ng-submit="login()">
+
+            <div class="form-group">
+                <label for="input-user" class="col-sm-2 control-label">Username / Email</label>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" id="input-user" placeholder="username / email address"
+                           ng-model="logindata.user">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="input-pass" class="col-sm-2 control-label">Password</label>
+                <div class="col-sm-5">
+                    <input type="password" class="form-control" id="input-pass" placeholder="password"
+                           ng-model="logindata.password">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-success">Log in</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+</div>
