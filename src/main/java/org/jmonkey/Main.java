@@ -25,7 +25,7 @@ public class Main {
 
         // Verify the connection to the database
         if (!JmeResourceWebsite.getInstance().getDatabaseManager().checkConnection()) {
-            throw new ConfigurationException("Error attempting to connecto to the database");
+            throw new ConfigurationException("Error attempting to connect to to the database");
         }
 
         // Initialize the database-based configuration
@@ -41,7 +41,7 @@ public class Main {
             JmeResourceWebsite.getInstance().getServer().join();
         }
         catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Server Error:", ex);
+            LOGGER.log(Level.SEVERE, "Server Error:", ex);
         }
         
     }

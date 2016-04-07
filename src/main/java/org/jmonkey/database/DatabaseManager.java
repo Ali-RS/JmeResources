@@ -57,12 +57,14 @@ public class DatabaseManager {
                 // configuration
                 .addAnnotatedClass(org.jmonkey.database.configuration.DatabaseSavedConfiguration.class)
                 .addAnnotatedClass(org.jmonkey.database.configuration.BintrayConfiguration.class)
-                .addAnnotatedClass(org.jmonkey.database.configuration.DiscourseConfiguration.class)
                 .addAnnotatedClass(org.jmonkey.database.configuration.GeneralConfiguration.class)
 
                 // permissions
                 .addAnnotatedClass(org.jmonkey.database.permission.JmePermission.class)
                 .addAnnotatedClass(org.jmonkey.database.permission.AdminPermission.class)
+
+                // private messages
+                .addAnnotatedClass(org.jmonkey.database.messaging.PrivateMessage.class)
 
                 // resources
                 .addAnnotatedClass(org.jmonkey.database.asset.PotentialAsset.class)
@@ -120,6 +122,39 @@ public class DatabaseManager {
 
             session.beginTransaction();
             session.update(JmeResourceWebsite.getInstance().getConfiguration().getDatabaseSavedConfiguration());
+            session.getTransaction().commit();
+            session.flush();
+        }
+    }
+
+    public void saveAnnotatedObject(Object object) {
+
+        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+
+            session.beginTransaction();
+            session.save(object);
+            session.getTransaction().commit();
+            session.flush();
+        }
+    }
+
+    public void deleteAnnotatedObject(Object object) {
+
+        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+
+            session.beginTransaction();
+            session.delete(object);
+            session.getTransaction().commit();
+            session.flush();
+        }
+    }
+
+    public void updateAnnotatedObject(Object object) {
+
+        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+
+            session.beginTransaction();
+            session.update(object);
             session.getTransaction().commit();
             session.flush();
         }

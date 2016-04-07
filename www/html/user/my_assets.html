@@ -108,7 +108,12 @@
                 </thead>
 
                 <tr ng-repeat="assetInfo in assets">
-                    <td>{{assetInfo.asset.packageName}}</td>
+
+                    <td>
+                        <a ng-href="/asset/{{assetInfo.user.username}}/{{assetInfo.asset.packageName}}/edit/"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Edit Asset"></span></a>
+                        &nbsp;
+                        <a ng-href="/asset/{{assetInfo.user.username}}/{{assetInfo.asset.packageName}}/">{{assetInfo.asset.packageName}}</a>
+                    </td>
                     <td>{{assetInfo.versions[assetInfo.versions.length - 1].version}}</td>
                     <td>{{assetInfo.versions[assetInfo.versions.length - 1].timeUploaded | date : 'medium'}}</td>
                 </tr>

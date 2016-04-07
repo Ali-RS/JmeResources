@@ -4,7 +4,7 @@ package org.jmonkey.server;
  * @author jayfella
  */
 
-public class InsufficientPermissionException extends Exception {
+public class InsufficientPermissionException extends RuntimeException {
 
     public InsufficientPermissionException() {
         super("You do not have the required permission to view this resource.");

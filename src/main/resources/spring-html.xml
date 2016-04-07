@@ -7,39 +7,27 @@
          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
          http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:annotation-config/>
     <mvc:annotation-driven />
-
-    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-        <property name="mediaTypes">
-            <map>
-                <entry key="eot" value="application/vnd.ms-fontobject" />
-                <entry key="ttf" value="application/font-sfnt" />
-                <entry key="svg" value="image/svg+xml" />
-                <entry key="woff" value="application/font-woff" />
-                <entry key="woff2" value="application/font-woff2" />
-            </map>
-        </property>
-    </bean>
-
-    <bean name="resourceHandler" class="org.jmonkey.server.CustomResourceHandler">
-    </bean>
-
-    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="urlMap">
-            <map>
-                <entry key="/theme/**" value-ref="resourceHandler"/>
-            </map>
-        </property>
-    </bean>
+    <context:annotation-config />
 
     <bean name="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="50000000" />
     </bean>
 
-    <mvc:resources mapping="/favicon.ico" location="./www/html/favicon.ico" />
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
 
-    <context:component-scan base-package="org.jmonkey.server.controller.html"/>
+    <mvc:resources mapping="/favicon.ico" location="/WEB-INF/resources/favicon.ico" />
+    <mvc:resources mapping="/css/**" location="/WEB-INF/resources/css/" />
+    <mvc:resources mapping="/images/**" location="/WEB-INF/resources/images/" />
+    <mvc:resources mapping="/js/**" location="/WEB-INF/resources/js/" />
+    <mvc:resources mapping="/lib/**" location="/WEB-INF/resources/lib/" />
+
+    <context:component-scan base-package="org.jmonkey.server.servlets.html"/>
+
 
 </beans>
 

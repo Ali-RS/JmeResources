@@ -6,8 +6,10 @@ import org.jmonkey.JmeResourceWebsite;
 import org.jmonkey.database.user.User;
 import org.jmonkey.database.user.UserManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * @author jayfella
@@ -24,6 +26,47 @@ public class AssetManager {
                     .list();
 
             return potentialAssets;
+        }
+    }
+
+    public List<PotentialAssetInfo> getPotentialAssetInfos() {
+
+        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+
+            List<PotentialAssetInfo> infos = new ArrayList<>();
+
+            @SuppressWarnings("unchecked")
+            List<PotentialAsset> potentialAssets = session.createCriteria(PotentialAsset.class)
+                    .add(Restrictions.eq("rejected", false))
+                    .list();
+
+            potentialAssets.forEach( pa ->  {
+
+                User user = (User) session.createCriteria(User.class)
+                        .add(Restrictions.eq("discourseId", pa.getDiscourseAuthorId()))
+                        .uniqueResult();
+
+                List<String> dirStructure = new ArrayList<>();
+
+                try {
+                    JarFile jarFile = new JarFile(pa.getAssetFile());
+
+                    Enumeration<JarEntry> jarEntries = jarFile.entries();
+
+                    while (jarEntries.hasMoreElements()) {
+                        JarEntry entry = jarEntries.nextElement();
+                        dirStructure.add(entry.getName());
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                PotentialAssetInfo paInfo = new PotentialAssetInfo(pa, user, dirStructure);
+                infos.add(paInfo);
+            });
+
+            return infos;
         }
     }
 
@@ -57,42 +100,18 @@ public class AssetManager {
 
     }
 
-    public void savePotentialAsset(PotentialAsset potentialAsset) {
-
-        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
-            session.beginTransaction();
-            session.save(potentialAsset);
-            session.getTransaction().commit();
-            session.flush();
-        }
-
-    }
-
-    public void deletePotentialAsset(PotentialAsset potentialAsset) {
-
-        try(Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
-
-            session.beginTransaction();
-            session.delete(potentialAsset);
-            session.getTransaction().commit();
-            session.flush();
-        }
-
-    }
-
-
-
-    public Asset saveOrUpdateAsset(Asset asset) {
+    public PotentialAsset getPotentialAsset(User user, String packageName) {
 
         try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
 
-            session.beginTransaction();
-            session.saveOrUpdate(asset);
-            session.getTransaction().commit();
-            session.flush();
+            PotentialAsset potentialAsset = (PotentialAsset) session.createCriteria(PotentialAsset.class)
+                    .add(Restrictions.eq("discourseAuthorId", user.getDiscourseId()))
+                    .add(Restrictions.eq("packageName", packageName))
+                    .uniqueResult();
 
-            return asset;
+            return potentialAsset;
         }
+
     }
 
     public List<AssetInfo> getRandomAssets(int amount) {
@@ -146,7 +165,32 @@ public class AssetManager {
 
     }
 
+    public AssetInfo getAssetInfo(String username, String packageName, String version) {
 
+        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+
+            User user = (User) session.createCriteria(User.class)
+                    .add(Restrictions.eq("username", username))
+                    .uniqueResult();
+
+            Asset asset = (Asset) session.createCriteria(Asset.class)
+                    .add(Restrictions.eq("discourseAuthorId", user.getDiscourseId()))
+                    .add(Restrictions.eq("packageName", packageName))
+                    .uniqueResult();
+
+            if (asset == null) {
+                return null;
+            }
+
+            AssetVersion assetVersion = (AssetVersion) session.createCriteria(AssetVersion.class)
+                    .add(Restrictions.eq("assetId", asset.getId()))
+                    .add((Restrictions.eq("version", version)))
+                    .uniqueResult();
+
+            return new AssetInfo(user, asset, assetVersion);
+        }
+
+    }
 
     public List<AssetVersion> getAssetVersions(Asset asset) {
 
@@ -160,17 +204,6 @@ public class AssetManager {
             return assetVersions;
         }
 
-    }
-
-    public void saveOrUpdateAssetVersion(AssetVersion assetVersion) {
-
-        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
-
-            session.beginTransaction();
-            session.saveOrUpdate(assetVersion);
-            session.getTransaction().commit();
-            session.flush();
-        }
     }
 
     public List<AssetInfo> getAssets(User user) {

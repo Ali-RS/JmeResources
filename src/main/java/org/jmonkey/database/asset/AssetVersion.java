@@ -3,6 +3,7 @@ package org.jmonkey.database.asset;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author jayfella
@@ -53,5 +54,9 @@ public class AssetVersion {
     @Column(name = "time_uploaded")
     public long getTimeUploaded() { return timeUploaded; }
     public void setTimeUploaded(long timeUploaded) { this.timeUploaded = timeUploaded; }
+
+    @Transient
+    @JsonIgnore
+    public Date getDateUploaded() { return new Date(this.timeUploaded); }
 
 }

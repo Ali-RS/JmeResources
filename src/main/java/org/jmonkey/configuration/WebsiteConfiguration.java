@@ -2,12 +2,13 @@ package org.jmonkey.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.nio.file.Path;
 
 /**
- *
  * @author jayfella
  */
+
 public class WebsiteConfiguration {
     
     private Path htmlPath;

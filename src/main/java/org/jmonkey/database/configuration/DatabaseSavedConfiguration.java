@@ -16,7 +16,6 @@ public class DatabaseSavedConfiguration implements Serializable {
     private long id;
 
     private BintrayConfiguration bintrayConfig;
-    private DiscourseConfiguration discourseConfig;
     private GeneralConfiguration generalConfig;
 
     @Id
@@ -28,10 +27,6 @@ public class DatabaseSavedConfiguration implements Serializable {
     @Embedded
     public BintrayConfiguration getBintrayConfig() { return this.bintrayConfig; }
     protected void setBintrayConfig(BintrayConfiguration bintrayConfig) { this.bintrayConfig = bintrayConfig; }
-
-    @Embedded
-    public DiscourseConfiguration getDiscourseConfig() { return discourseConfig; }
-    protected void setDiscourseConfig(DiscourseConfiguration discourseConfig) { this.discourseConfig = discourseConfig; }
 
     @Embedded
     public GeneralConfiguration getGeneralConfig() { return generalConfig; }

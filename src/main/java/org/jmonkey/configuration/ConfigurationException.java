@@ -1,9 +1,9 @@
 package org.jmonkey.configuration;
 
 /**
- *
  * @author jayfella
  */
+
 public class ConfigurationException extends Exception {
     
     public ConfigurationException() {

@@ -3,6 +3,7 @@ package org.jmonkey.database.asset;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.Date;
 
 /**
  * @author jayfella
@@ -21,7 +22,9 @@ public class PotentialAsset implements Serializable {
     private String versionDescription;
     private String packageReadme;
     private String assetFile;
-    private long dateUploaded;
+    private long timeUploaded;
+
+    private boolean rejected;
 
     public PotentialAsset() {}
 
@@ -34,7 +37,8 @@ public class PotentialAsset implements Serializable {
         this.versionDescription = versionDescription;
         this.packageReadme = packageReadme;
         this.assetFile = assetFile;
-        this.dateUploaded = System.currentTimeMillis();
+        this.timeUploaded = System.currentTimeMillis();
+        this.rejected = false;
     }
 
     @Id
@@ -56,22 +60,30 @@ public class PotentialAsset implements Serializable {
 
     @Column(name = "showcase_image")
     public String getShowcaseImage() { return showcaseImage; }
-    protected void setShowcaseImage(String showcaseImage) { this.showcaseImage = showcaseImage; }
+    public void setShowcaseImage(String showcaseImage) { this.showcaseImage = showcaseImage; }
 
     @Column(name = "version_description")
     public String getVersionDescription() { return this.versionDescription; }
-    protected void setVersionDescription(String versionDescription) { this.versionDescription = versionDescription; }
+    public void setVersionDescription(String versionDescription) { this.versionDescription = versionDescription; }
 
     @Column(name = "package_readme", length = 16384)
     public String getPackageReadme() { return packageReadme; }
-    protected void setPackageReadme(String packageReadme) { this.packageReadme = packageReadme; }
+    public void setPackageReadme(String packageReadme) { this.packageReadme = packageReadme; }
 
     @Column(name = "asset_file")
     public String getAssetFile() { return assetFile; }
     protected void setAssetFile(String assetFile) { this.assetFile = assetFile; }
 
-    @Column(name = "date_uploaded")
-    public long getDateUploaded() { return this.dateUploaded; }
-    protected void setDateUploaded(long dateUploaded) { this.dateUploaded = dateUploaded; }
+    @Column(name = "time_uploaded")
+    public long getTimeUploaded() { return this.timeUploaded; }
+    protected void setTimeUploaded(long dateUploaded) { this.timeUploaded = dateUploaded; }
 
+    @Column(name = "rejected")
+    public boolean getRejected() { return this.rejected; }
+    public void setRejected(boolean rejected) { this.rejected = rejected; }
+
+    @Transient
+    public Date getDateUploaded() {
+        return new Date(this.timeUploaded);
+    }
 }

@@ -9,18 +9,47 @@ Please <a href="/login/">log in</a> to view this page.
     angular.module("editAsset", [])
             .controller("EditAssetController", [ "$scope", "$http", function($scope, $http) {
 
-                $scope.getAssetInfo = function() {
+                $scope.assetInfo = {};
 
+                $scope.getAssetInfo = function(user, packageName) {
 
-
+                    $http({
+                        method: "GET",
+                        url: "/api/asset/" + user + "/" + packageName + "/"
+                    }).then(function successCallback(response) {
+                        $scope.assetInfo = response.data;
+                    }, function errorCallback(response) {
+                        bootbox.alert(response.data);
+                    });
 
                 };
+
+                var metaElement = $("meta[name=asset-data]");
+                var user = $(metaElement).attr("data-user");
+                var packageName = $(metaElement).attr("data-package");
+
+                $scope.getAssetInfo(user, packageName);
 
             }]);
 
 </script>
 
-<div>
+<div ng-app="editAsset" ng-controller="EditAssetController">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>Edit Asset: {{assetInfo.asset.packageName}}</h2>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+
+
+
+        </div>
+    </div>
 
 </div>
 

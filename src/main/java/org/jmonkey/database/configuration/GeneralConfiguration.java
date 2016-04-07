@@ -1,5 +1,7 @@
 package org.jmonkey.database.configuration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 /**
@@ -24,5 +26,6 @@ public class GeneralConfiguration extends DatabaseSavedConfiguration {
     @Column(name = "general_page_title_append", length = 128)
     public String getPageTitleAppend() { return this.pageTitleAppend; }
     public void setPageTitleAppend(String pageTitleAppend) { this.pageTitleAppend = pageTitleAppend; }
+
 
 }

@@ -1,15 +1,11 @@
 package org.jmonkey;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mysql.fabric.xmlrpc.base.Data;
 import org.hibernate.Session;
 import org.jmonkey.configuration.Configuration;
 import org.jmonkey.configuration.ConfigurationException;
 import org.jmonkey.database.DatabaseManager;
-import org.jmonkey.database.configuration.BintrayConfiguration;
 import org.jmonkey.database.configuration.DatabaseSavedConfiguration;
-import org.jmonkey.database.configuration.DiscourseConfiguration;
-import org.jmonkey.database.configuration.GeneralConfiguration;
 import org.jmonkey.server.Server;
 
 import java.io.File;
@@ -53,10 +49,17 @@ public class JmeResourceWebsite {
 
         if (!jsonConfigFile.exists()) {
 
-            try (PrintWriter printWriter = new PrintWriter(jsonConfigFile)) {
+            File exampleConfigFile = new File("config-sample.json");
+            
+            if (!exampleConfigFile.exists()) {
+                
+                exampleConfigFile.createNewFile();
+                
+                try (PrintWriter printWriter = new PrintWriter(jsonConfigFile)) {
 
-                String sampleContent = new String(Files.readAllBytes(Paths.get(getClass().getResource("/config-example.json").toURI())));
-                printWriter.println(sampleContent);
+                    String sampleContent = new String(Files.readAllBytes(Paths.get(getClass().getResource("/config-example.json").toURI())));
+                    printWriter.println(sampleContent);
+                }
             }
 
             throw new ConfigurationException("unable to locate 'config.json' configuration file. A template file has been created for you. Please amend it accordingly and restart the application.");
@@ -80,7 +83,7 @@ public class JmeResourceWebsite {
         return this.server;
     }
 
-    public void initializeServer() throws ConfigurationException {
+    public void initializeServer() throws ConfigurationException, IOException {
 
         if (configuration == null) {
             throw new ConfigurationException("configuration has not yet been specified! Unable to initialize server.");

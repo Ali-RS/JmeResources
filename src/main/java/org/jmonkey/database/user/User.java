@@ -1,6 +1,10 @@
 package org.jmonkey.database.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.Session;
+import org.jmonkey.JmeResourceWebsite;
+import org.jmonkey.database.permission.JmePermission;
+import org.jmonkey.database.permission.PermissionManager;
 import org.jmonkey.external.discourse.DiscourseLoginResult;
 
 import javax.persistence.*;
@@ -51,4 +55,21 @@ public class User implements Serializable {
     public long getDiscourseId() { return this.discourseId; }
     protected void setDiscourseId(long discourseId) { this.discourseId = discourseId; }
 
+    @Transient
+    public boolean hasPermission(Class<? extends JmePermission> permission) {
+        return PermissionManager.hasPermission(this, permission);
+    }
+
+    @Transient
+    public void invalidateSession() {
+
+        try(Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+
+            this.setSession(null);
+            session.beginTransaction();
+            session.update(this);
+            session.getTransaction().commit();
+            session.flush();
+        }
+    }
 }

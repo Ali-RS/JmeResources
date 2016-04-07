@@ -2,10 +2,12 @@ package org.jmonkey.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jmonkey.JmeResourceWebsite;
 import org.jmonkey.database.configuration.BintrayConfiguration;
 import org.jmonkey.database.configuration.DatabaseSavedConfiguration;
-import org.jmonkey.database.configuration.DiscourseConfiguration;
 import org.jmonkey.database.configuration.GeneralConfiguration;
+
+import javax.persistence.Transient;
 
 /**
  * @author jayfella
@@ -16,10 +18,7 @@ public class Configuration {
     private DatabaseConfiguration databaseConfig;
     private ServerConfiguration serverConfig;
     private WebsiteConfiguration websiteConfig;
-
-    // private GeneralConfiguration generalConfig;
-    // private BintrayConfiguration bintrayConfig;
-    // private DiscourseConfiguration discourseConfig;
+    private DiscourseConfiguration discourseConfig;
     private DatabaseSavedConfiguration dbsConfig;
 
     @JsonProperty("database")
@@ -34,6 +33,10 @@ public class Configuration {
     public WebsiteConfiguration getWebsiteConfig() { return websiteConfig; }
     public void setWebsiteConfig(WebsiteConfiguration websiteConfig) { this.websiteConfig = websiteConfig; }
 
+    @JsonProperty("discourse")
+    public DiscourseConfiguration getDiscourseConfig() { return this.discourseConfig; }
+    public void setDiscourseConfig (DiscourseConfiguration discourseConfig) { this.discourseConfig = discourseConfig; }
+    
     @JsonIgnore
     public DatabaseSavedConfiguration getDatabaseSavedConfiguration() { return this.dbsConfig; }
     public void setDatabaseSavedConfiguration(DatabaseSavedConfiguration dbsConfig) { this.dbsConfig = dbsConfig; }
@@ -42,9 +45,16 @@ public class Configuration {
     public BintrayConfiguration getBintrayConfig() { return dbsConfig.getBintrayConfig(); }
 
     @JsonIgnore
-    public DiscourseConfiguration getDiscourseConfig() { return dbsConfig.getDiscourseConfig(); }
-
-    @JsonIgnore
     public GeneralConfiguration getGeneralConfig() { return this.dbsConfig.getGeneralConfig(); }
+
+    @Transient
+    @JsonIgnore
+    public static String formatPageTitle(final String title) {
+
+        return JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitlePrepend() + " "
+                + title
+                + JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitleAppend();
+    }
+
 
 }

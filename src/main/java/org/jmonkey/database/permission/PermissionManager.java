@@ -42,7 +42,7 @@ public class PermissionManager {
         }
     }
 
-    public boolean hasPermission(User user, Class<? extends JmePermission> permission) {
+    public static boolean hasPermission(final User user, final Class<? extends JmePermission> permission) {
 
         if (user == null) {
             return false;
