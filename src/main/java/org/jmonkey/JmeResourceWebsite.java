@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 public class JmeResourceWebsite {
 
     private static JmeResourceWebsite INSTANCE;
+    private static ObjectMapper OBJECTMAPPER;
     
     private Configuration configuration;
     private DatabaseManager databaseManager;
@@ -37,6 +38,10 @@ public class JmeResourceWebsite {
         }
         
         return INSTANCE;
+    }
+    
+    public static ObjectMapper getObjectMapper() {
+        return OBJECTMAPPER;
     }
     
     public Configuration getConfiguration() {
@@ -65,8 +70,7 @@ public class JmeResourceWebsite {
             throw new ConfigurationException("unable to locate 'config.json' configuration file. A template file has been created for you. Please amend it accordingly and restart the application.");
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        this.configuration = objectMapper.readValue(jsonConfigFile, Configuration.class);
+        this.configuration = JmeResourceWebsite.getObjectMapper().readValue(jsonConfigFile, Configuration.class);
     }
 
     public void initializeDatabaseConfiguration() {
@@ -77,7 +81,6 @@ public class JmeResourceWebsite {
             configuration.setDatabaseSavedConfiguration(dbsConfig);
         }
     }
-
 
     public Server getServer() {
         return this.server;

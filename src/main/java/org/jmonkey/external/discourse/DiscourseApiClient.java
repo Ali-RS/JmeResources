@@ -1,6 +1,5 @@
 package org.jmonkey.external.discourse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -58,9 +57,7 @@ public class DiscourseApiClient {
                 String response = EntityUtils.toString(entity);
                 EntityUtils.consume(entity);
 
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                Map<String, String> csrfData = objectMapper.readValue(response, objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, String.class));
+                Map<String, String> csrfData = JmeResourceWebsite.getObjectMapper().readValue(response, JmeResourceWebsite.getObjectMapper().getTypeFactory().constructMapType(HashMap.class, String.class, String.class));
 
                 if (csrfData.get("csrf") == null) {
                     throw new ServerResponseException(request.getURI().toString(), statusCode, httpResponse.getStatusLine().getReasonPhrase());
@@ -90,9 +87,7 @@ public class DiscourseApiClient {
                 String response = EntityUtils.toString(entity);
                 EntityUtils.consume(entity);
 
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                DiscourseLoginResult loginResult = objectMapper.readValue(response, DiscourseLoginResult.class);
+                DiscourseLoginResult loginResult = JmeResourceWebsite.getObjectMapper().readValue(response, DiscourseLoginResult.class);
 
                 String forumSession = context.getCookieStore().getCookies().stream()
                         .filter(cookie -> cookie.getName().equals("_forum_session"))

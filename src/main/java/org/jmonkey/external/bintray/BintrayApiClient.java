@@ -1,7 +1,6 @@
 package org.jmonkey.external.bintray;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -93,9 +92,7 @@ public class BintrayApiClient {
                 String entityString = EntityUtils.toString(entity);
                 EntityUtils.consume(entity);
 
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                List<BintrayFile> results = objectMapper.readValue(entityString, new TypeReference<List<BintrayFile>>(){});
+                List<BintrayFile> results = JmeResourceWebsite.getObjectMapper().readValue(entityString, new TypeReference<List<BintrayFile>>(){});
 
                 return results;
             }
@@ -122,9 +119,7 @@ public class BintrayApiClient {
                 String entityString = EntityUtils.toString(entity);
                 EntityUtils.consume(entity);
 
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                BintrayFile result = objectMapper.readValue(entityString, BintrayFile.class);
+                BintrayFile result = JmeResourceWebsite.getObjectMapper().readValue(entityString, BintrayFile.class);
 
                 return result;
             }
@@ -151,9 +146,7 @@ public class BintrayApiClient {
                 String entityString = EntityUtils.toString(entity);
                 EntityUtils.consume(entity);
                 
-                ObjectMapper objectMapper = new ObjectMapper();
-                
-                Map<Object, Object> result = objectMapper.readValue(entityString, new TypeReference<Map<Object, Object>>(){});
+                Map<Object, Object> result = JmeResourceWebsite.getObjectMapper().readValue(entityString, new TypeReference<Map<Object, Object>>(){});
                 
                 // https://bintray.com/docs/api/#_get_readme
                 
@@ -220,7 +213,7 @@ public class BintrayApiClient {
             jsonData.put("public_download_numbers", "true");
             // jsonData.put("public_stats", "false");
 
-            String json = new ObjectMapper().writeValueAsString(jsonData);
+            String json = JmeResourceWebsite.getObjectMapper().writeValueAsString(jsonData);
 
             StringEntity requestEntity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
@@ -259,7 +252,7 @@ public class BintrayApiClient {
             jsonData.put("github_use_tag_release_notes", "false");
             jsonData.put("vcs_tag", "version");
 
-            String json = new ObjectMapper().writeValueAsString(jsonData);
+            String json = JmeResourceWebsite.getObjectMapper().writeValueAsString(jsonData);
 
             StringEntity requestEntity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
@@ -316,7 +309,7 @@ public class BintrayApiClient {
 
             jsonData.put("bintray", bintrayData);
 
-            String json = new ObjectMapper().writeValueAsString(jsonData);
+            String json = JmeResourceWebsite.getObjectMapper().writeValueAsString(jsonData);
 
             StringEntity requestEntity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
