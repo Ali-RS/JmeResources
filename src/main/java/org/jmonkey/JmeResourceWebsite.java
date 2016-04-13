@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author jayfella
@@ -22,7 +24,7 @@ import java.nio.file.Paths;
 public class JmeResourceWebsite {
 
     private static JmeResourceWebsite INSTANCE;
-    private static ObjectMapper OBJECTMAPPER;
+    private static ObjectMapper OBJECTMAPPER = new ObjectMapper();
     
     private Configuration configuration;
     private DatabaseManager databaseManager;
@@ -54,19 +56,12 @@ public class JmeResourceWebsite {
 
         if (!jsonConfigFile.exists()) {
 
-            File exampleConfigFile = new File("config-sample.json");
-            
-            if (!exampleConfigFile.exists()) {
-                
-                exampleConfigFile.createNewFile();
-                
-                try (PrintWriter printWriter = new PrintWriter(jsonConfigFile)) {
+            try (PrintWriter printWriter = new PrintWriter(jsonConfigFile)) {
 
-                    String sampleContent = new String(Files.readAllBytes(Paths.get(getClass().getResource("/config-example.json").toURI())));
+                    String sampleContent = new String(IOUtils.toByteArray(getClass().getResourceAsStream("/config-example.json")));
                     printWriter.println(sampleContent);
-                }
             }
-
+            
             throw new ConfigurationException("unable to locate 'config.json' configuration file. A template file has been created for you. Please amend it accordingly and restart the application.");
         }
 
