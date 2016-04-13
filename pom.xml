@@ -14,7 +14,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <jetty-version>9.3.9.M0</jetty-version>
+        <jetty-version>9.3.9.M1</jetty-version>
         <spring-version>4.2.5.RELEASE</spring-version>
     </properties>
     
@@ -212,25 +212,7 @@
                     </archive>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.4.3</version>
-                        <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>shade</goal>
-                            </goals>
-                            <configuration>
-                                <shadedArtifactAttached>true</shadedArtifactAttached>
-                                <shadedClassifierName>jackofall</shadedClassifierName> <!-- Any name that makes sense -->
-                            </configuration>
-                        </execution>
-                    </executions>
-              </plugin>
-
+            
         </plugins>
     </build>
     
