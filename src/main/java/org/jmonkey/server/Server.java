@@ -99,7 +99,7 @@ public class Server extends org.eclipse.jetty.server.Server {
     {
         JettyJasperInitializer sci = new JettyJasperInitializer();
         ContainerInitializer initializer = new ContainerInitializer(sci, null);
-        List<ContainerInitializer> initializers = new ArrayList<ContainerInitializer>();
+        List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(initializer);
         return initializers;
     }
