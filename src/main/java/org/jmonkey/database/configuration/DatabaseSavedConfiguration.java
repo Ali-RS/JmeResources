@@ -25,11 +25,23 @@ public class DatabaseSavedConfiguration implements Serializable {
     protected void setId(long id) { this.id = id; }
 
     @Embedded
-    public BintrayConfiguration getBintrayConfig() { return this.bintrayConfig; }
+    public BintrayConfiguration getBintrayConfig() { 
+        if (this.bintrayConfig == null) {
+            this.bintrayConfig = new BintrayConfiguration();
+        }
+        
+        return this.bintrayConfig; 
+    }
     protected void setBintrayConfig(BintrayConfiguration bintrayConfig) { this.bintrayConfig = bintrayConfig; }
 
     @Embedded
-    public GeneralConfiguration getGeneralConfig() { return generalConfig; }
+    public GeneralConfiguration getGeneralConfig() { 
+        if (this.generalConfig == null) {
+            this.generalConfig = new GeneralConfiguration();
+        }
+        
+        return generalConfig; 
+    }
     public void setGeneralConfig(GeneralConfiguration generalConfig) { this.generalConfig = generalConfig; }
 
 }
