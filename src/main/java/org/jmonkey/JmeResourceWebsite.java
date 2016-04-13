@@ -73,6 +73,16 @@ public class JmeResourceWebsite {
         try (Session session = this.databaseManager.openSession()) {
 
             DatabaseSavedConfiguration dbsConfig = (DatabaseSavedConfiguration) session.createCriteria(DatabaseSavedConfiguration.class).uniqueResult();
+            
+            if (dbsConfig == null) {
+                dbsConfig = new DatabaseSavedConfiguration();
+                
+                session.beginTransaction();
+                session.save(dbsConfig);
+                session.getTransaction().commit();
+                session.flush();
+            }
+            
             configuration.setDatabaseSavedConfiguration(dbsConfig);
         }
     }

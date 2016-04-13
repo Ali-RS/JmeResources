@@ -51,9 +51,14 @@ public class Configuration {
     @JsonIgnore
     public static String formatPageTitle(final String title) {
 
-        return JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitlePrepend() + " "
+        String pre = JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitlePrepend();
+        String app = JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitleAppend();
+        
+        return pre + title + app;
+        
+        /* return JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitlePrepend() + " "
                 + title
-                + JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitleAppend();
+                + JmeResourceWebsite.getInstance().getConfiguration().getGeneralConfig().getPageTitleAppend();*/
     }
 
 
