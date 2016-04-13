@@ -107,7 +107,7 @@ public class Server extends org.eclipse.jetty.server.Server {
     private File getScratchDir() throws IOException
     {
         File tempDir = new File(System.getProperty("java.io.tmpdir"));
-        File scratchDir = new File(tempDir.toString(), "embedded-jetty-jsp");
+        File scratchDir = new File(tempDir.toString(), "jme-store");
 
         if (!scratchDir.exists())
         {
