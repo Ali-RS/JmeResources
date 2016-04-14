@@ -12,9 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -23,6 +22,8 @@ import org.apache.commons.io.IOUtils;
 
 public class JmeResourceWebsite {
 
+    private static final Logger LOGGER = Logger.getLogger("org.jmonkey.resourcewebsite");
+    
     private static JmeResourceWebsite INSTANCE;
     private static ObjectMapper OBJECTMAPPER = new ObjectMapper();
     
@@ -31,7 +32,7 @@ public class JmeResourceWebsite {
     private Server server;
     
     private JmeResourceWebsite() {
-        
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
     }
     
     public static JmeResourceWebsite getInstance() {
@@ -115,4 +116,22 @@ public class JmeResourceWebsite {
         }
     }
 
+    private final Thread shutdownThread = new Thread() {
+        
+        @Override
+        public void run() {
+            
+            try {
+                LOGGER.info("Shutting down Jetty server...");
+                getServer().stop();
+
+                LOGGER.info("Shutting down hibernate...");
+                getDatabaseManager().close();
+            }
+            catch (Exception ex) {
+                
+                LOGGER.log(Level.SEVERE, "Error shutting down JmeResourceWebsite", ex);
+            }
+        }
+    };
 }
