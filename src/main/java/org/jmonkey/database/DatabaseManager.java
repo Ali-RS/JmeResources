@@ -164,7 +164,7 @@ public class DatabaseManager implements Closeable {
 
     @Override
     public void close() throws IOException {
-        if (this.sessionFactory != null && !sessionFactory.isClosed()) {
+        if (this.sessionFactory != null) {
             sessionFactory.close();
         }
     }
