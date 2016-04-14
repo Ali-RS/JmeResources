@@ -1,5 +1,7 @@
 package org.jmonkey.database;
 
+import java.io.Closeable;
+import java.io.IOException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -15,7 +17,7 @@ import java.util.logging.Logger;
  * @author jayfella
  */
 
-public class DatabaseManager {
+public class DatabaseManager implements Closeable {
 
     private static final Logger LOG = Logger.getLogger("org.jmonkey.database");
     private final SessionFactory sessionFactory;
@@ -74,7 +76,7 @@ public class DatabaseManager {
                 .buildSessionFactory(serviceRegistry);
 
         LOG.log(Level.INFO, "Built database connection to: {0}", connectionString);
-
+        
     }
 
     private String buildConnectionString(DatabaseType dbType, DatabaseConfiguration config)
@@ -129,7 +131,7 @@ public class DatabaseManager {
 
     public void saveAnnotatedObject(Object object) {
 
-        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+        try (Session session = openSession()) {
 
             session.beginTransaction();
             session.save(object);
@@ -140,7 +142,7 @@ public class DatabaseManager {
 
     public void deleteAnnotatedObject(Object object) {
 
-        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+        try (Session session = openSession()) {
 
             session.beginTransaction();
             session.delete(object);
@@ -151,12 +153,19 @@ public class DatabaseManager {
 
     public void updateAnnotatedObject(Object object) {
 
-        try (Session session = JmeResourceWebsite.getInstance().getDatabaseManager().openSession()) {
+        try (Session session = openSession()) {
 
             session.beginTransaction();
             session.update(object);
             session.getTransaction().commit();
             session.flush();
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (this.sessionFactory != null && !sessionFactory.isClosed()) {
+            sessionFactory.close();
         }
     }
 
