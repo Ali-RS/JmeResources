@@ -25,7 +25,7 @@ public class JmeResourceWebsite {
     private static final Logger LOGGER = Logger.getLogger("org.jmonkey.resourcewebsite");
     
     private static JmeResourceWebsite INSTANCE;
-    private static ObjectMapper OBJECTMAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECTMAPPER = new ObjectMapper();
     
     private Configuration configuration;
     private DatabaseManager databaseManager;
@@ -122,10 +122,8 @@ public class JmeResourceWebsite {
         public void run() {
             
             try {
-                LOGGER.info("Shutting down Jetty server...");
+                LOGGER.info("Shutting down services gracefully...");
                 getServer().stop();
-
-                LOGGER.info("Shutting down hibernate...");
                 getDatabaseManager().close();
             }
             catch (Exception ex) {
